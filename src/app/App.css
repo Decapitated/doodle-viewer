@@ -1,0 +1,10 @@
+.image-container {
+    display: flex;
+    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.image-container > div {
+    margin: 0.5rem;
+}
