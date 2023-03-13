@@ -1,6 +1,6 @@
-const PImage = require("pureimage");
-const fs = require('fs');
-const ndjson = require('ndjson');
+import PImage from "pureimage";
+import fs from 'fs';
+import ndjson from 'ndjson';
 
 export interface Drawing {
     key_id:      string,      // 64-bit unsigned integer. A unique identifier across all drawings.
@@ -50,21 +50,23 @@ export function drawStrokes(identifier: string, d: Drawing) {
         const image = PImage.make(256, 256);
         const ctx = image.getContext('2d');
         // fill with black
-        ctx.fillStyle = 'black';
+        ctx.fillStyle = 'white';
         ctx.fillRect(0,0,256,256);
 
-        ctx.strokeStyle = 'white';
-        ctx.beginPath();
+        ctx.strokeStyle = 'black';
         for(const stroke of d.drawing) {
-            ctx.moveTo(stroke[0][0], stroke[1][0]);
-            for(let i = 1; i < stroke.length; i++) {
-                ctx.lineTo(stroke[0][i], stroke[1][i]);
+            const x_array = stroke[0];
+            const y_array = stroke[1];
+            ctx.beginPath();
+            ctx.moveTo(x_array[0], y_array[0]);
+            for(let i = 1; i < x_array.length; i++) {
+                ctx.lineTo(x_array[i], y_array[i]);
             }
+            ctx.stroke();
         }
-        ctx.stroke();
 
         //write to 'out.png'
-        const writeStream = fs.createWriteStream(`./temp/out-${identifier}.png`);
+        const writeStream = fs.createWriteStream(`./temp/out-${d.key_id}.png`);
         PImage.encodePNGToStream(image, writeStream).then(() => {
             console.log(`wrote out the png file to ${writeStream.path}`);
             var _img = fs.readFileSync(writeStream.path).toString('base64');
@@ -73,5 +75,5 @@ export function drawStrokes(identifier: string, d: Drawing) {
             console.error("there was an error writing");
             reject(e);
         });
-    }
+    });
 }
