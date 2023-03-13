@@ -29,7 +29,7 @@ class App extends Component<any, AppState> {
             <div><DrawingDisplay drawing={drawing}></DrawingDisplay></div>
         );
         return(<div className="app-body">
-            <h2>Hello world!</h2>
+            <h2>Doodle Viewer!</h2>
             <div>
                 <button type="button" id="btn" onClick={this.openDataset}>Open Dataset</button>
                 <label>
@@ -46,6 +46,7 @@ class App extends Component<any, AppState> {
                 {this.state.drawingsIndex < Math.floor(this.state.drawings.length / this.state.numDrawings) &&
                     <button onClick={() => this.viewIndexChange(this.state.drawingsIndex + 1)}>Next</button>}
             </div>
+            <h3>{this.state.drawings[0]?.word}</h3>
             <div className="image-container" key={drawingSlice[0] && drawingSlice[0].key_id || 0}>{drawings}</div>
         </div>);
     }
