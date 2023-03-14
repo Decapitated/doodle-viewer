@@ -57,8 +57,12 @@ app.on('activate', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 
+interface OpenDoodlesReturn {
+    drawings: Drawing[];
+    datasetPath: string;
+}
 function openDoodleDataset() {
-    return new Promise<Drawing[]>(async (resolve, reject) => {
+    return new Promise<OpenDoodlesReturn>(async (resolve, reject) => {
         const { canceled, filePaths } = await dialog.showOpenDialog({
             filters: [{
                 name: 'Newline Delimited JSON',
@@ -72,7 +76,10 @@ function openDoodleDataset() {
             const datasetPath = filePaths[0];
             parseSimplifiedDrawings(datasetPath).then((drawings) => {
                 console.log("# of drawings:", drawings.length);
-                resolve(drawings);
+                resolve({
+                    drawings: drawings,
+                    datasetPath: datasetPath
+                });
             }).catch((e) => {
                 console.error(e);
                 reject(e);
@@ -92,7 +99,7 @@ function outputDrawing(_: Electron.IpcMainInvokeEvent, identifier: string, d: Dr
 }
 
 export interface API {
-    openDataset: () => Promise<Drawing[]>;
+    openDataset: () => Promise<OpenDoodlesReturn>;
     outputDrawing: (identifier: string, d: Drawing) => Promise<string>;
 }
 

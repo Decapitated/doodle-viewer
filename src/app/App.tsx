@@ -1,18 +1,23 @@
 import './App.css';
-import { Component } from 'react';
+import { Component, createRef, Fragment } from 'react';
 import DrawingDisplay from './DrawingDisplay';
 import { Drawing } from '../api/parseData';
+import { Button, FormControl, InputLabel, MenuItem, Select, CssBaseline } from '@mui/material';
 
 interface AppState {
+    datasetPath: string;
     drawings: Drawing[];
     numDrawings: number;
     drawingsIndex: number;
 }
 
 class App extends Component<any, AppState> {
+    viewContainerRef: React.RefObject<HTMLDivElement>;
     constructor(props: any) {
         super(props);
+        this.viewContainerRef = createRef<HTMLDivElement>();
         this.state = {
+            datasetPath: null,
             drawings: [],
             numDrawings: 10,
             drawingsIndex: 0
@@ -26,42 +31,60 @@ class App extends Component<any, AppState> {
         const sliceEnd = sliceStart + this.state.numDrawings;
         const drawingSlice = this.state.drawings.slice(sliceStart, sliceEnd);
         const drawings = drawingSlice.map((drawing) =>
-            <div><DrawingDisplay drawing={drawing}></DrawingDisplay></div>
+            <div key={drawing.key_id}><DrawingDisplay drawing={drawing}></DrawingDisplay></div>
         );
-        return(<div className="app-body">
-            <h2>Doodle Viewer!</h2>
-            <div>
-                <button type="button" id="btn" onClick={this.openDataset}>Open Dataset</button>
-                <label>
-                    <span>Drawings/Page</span>
-                    <select onChange={this.numPerPageChange} value={this.state.numDrawings}>
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                </label>
-                {this.state.drawingsIndex > 0 &&
-                    <button onClick={() => this.viewIndexChange(this.state.drawingsIndex - 1)}>Prev</button>}
-                {this.state.drawingsIndex < Math.floor(this.state.drawings.length / this.state.numDrawings) &&
-                    <button onClick={() => this.viewIndexChange(this.state.drawingsIndex + 1)}>Next</button>}
+        const fileName = this.state.datasetPath?.split('\\').at(-1);
+        return(<Fragment>
+            <CssBaseline />
+            <h1 className="title" ref={this.viewContainerRef}>Doodle Viewer!</h1>
+            <div className="action-bar">
+                <Button variant="contained" onClick={this.openDataset}>{fileName ?? 'Open Dataset'}</Button>
+                <FormControl>
+                    <InputLabel id="demo-simple-select-label"># Per Page</InputLabel>
+                    <Select labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={this.state.numDrawings}
+                            label="# Per Page"
+                            onChange={this.numPerPageChange}>
+                        <MenuItem value={10}>10</MenuItem>
+                        <MenuItem value={25}>25</MenuItem>
+                        <MenuItem value={50}>50</MenuItem>
+                        <MenuItem value={100}>100</MenuItem>
+                    </Select>
+                </FormControl>
             </div>
             <h3>{this.state.drawings[0]?.word}</h3>
             <div className="image-container" key={drawingSlice[0] && drawingSlice[0].key_id || 0}>{drawings}</div>
-        </div>);
+            {this.state.drawings.length > 0 &&
+                <div className="page-controls">
+                    <Button variant="contained" onClick={() => this.viewIndexChange(this.state.drawingsIndex - 1)} disabled={this.state.drawingsIndex <= 0}>Prev</Button>
+                    <Button variant="contained" onClick={() => this.viewIndexChange(this.state.drawingsIndex + 1)} disabled={this.state.drawingsIndex >= Math.floor(this.state.drawings.length / this.state.numDrawings)}>Next</Button>
+                </div>
+            }
+        </Fragment>);
     }
 
     numPerPageChange(event: any) {
-        this.setState({ numDrawings: parseInt(event.target.value) });
+        this.scrollToTop();
+        this.setState({ drawingsIndex: 0, numDrawings: parseInt(event.target.value) });
     }
 
     viewIndexChange(newVal: number) {
+        this.scrollToTop();
         this.setState({ drawingsIndex: newVal });
+    }
+
+    scrollToTop() {
+        this.viewContainerRef.current.scrollIntoView();
     }
 
     async openDataset() {
         const dataset = await window.electronAPI.openDataset();
-        this.setState({ drawings: dataset });
+        this.setState({
+            drawings: dataset.drawings,
+            datasetPath: dataset.datasetPath,
+            drawingsIndex: 0
+        });
     }
 }
 

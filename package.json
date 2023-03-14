@@ -43,6 +43,10 @@
     "web-vitals": "^3.3.0"
   },
   "dependencies": {
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
+    "@fontsource/roboto": "^4.5.8",
+    "@mui/material": "^5.11.12",
     "electron-squirrel-startup": "^1.0.0",
     "ndjson": "^2.0.0",
     "pureimage": "^0.3.17",

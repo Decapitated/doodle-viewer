@@ -1,3 +1,6 @@
+import { Card, CardContent, CardMedia, Typography, Zoom } from '@mui/material';
+import CardHeader from '@mui/material/CardHeader';
+import Tooltip from '@mui/material/Tooltip';
 import { Component, createRef, useRef} from 'react';
 import { Drawing } from '../api/parseData';
 
@@ -5,11 +8,19 @@ interface PropTypes {
     drawing: Drawing;
 }
 
-class DrawingDisplay extends Component<PropTypes> {
+interface StateTypes {
+    imageData: string;
+}
+
+class DrawingDisplay extends Component<PropTypes, StateTypes> {
     canvasRef: React.RefObject<HTMLCanvasElement>;
+    imageRef: React.RefObject<HTMLImageElement>;
     constructor(props: PropTypes) {
         super(props);
         this.canvasRef = createRef<HTMLCanvasElement>();
+        this.state = {
+            imageData: ''
+        };
     }
 
     async componentDidMount() {
@@ -30,11 +41,27 @@ class DrawingDisplay extends Component<PropTypes> {
             }
             ctx.stroke();
         }
+        this.setState({ imageData: canvas.toDataURL('image/png') });
     }
 
     render() {
         return (
-            <canvas ref={this.canvasRef} width="256" height="256"></canvas>
+            <Card>
+                <CardMedia sx={{ height: 256, width: 256}} image={this.state.imageData}>
+                    <canvas ref={this.canvasRef} width="256" height="256" hidden={true}></canvas>
+                </CardMedia>
+                <CardContent>
+                    <Tooltip TransitionComponent={Zoom} title="Recognized?" placement="top">
+                        <Typography gutterBottom variant="h5" component="div">{String(this.props.drawing.recognized)}</Typography>   
+                    </Tooltip>
+                    <Typography variant="body2" color="text.secondary">
+                        {this.props.drawing.countrycode}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                        {this.props.drawing.timestamp}
+                    </Typography>
+                </CardContent>
+            </Card>
         );
     }
 }

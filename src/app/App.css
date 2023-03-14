@@ -1,10 +1,58 @@
+#app {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    overflow-y: auto;
+    padding: 0 2rem;
+}
+
+.title {
+    text-align: center;
+}
+
 .image-container {
     display: flex;
     flex-direction: column;
     flex-direction: row;
     flex-wrap: wrap;
+    justify-content:left;
 }
 
 .image-container > div {
-    margin: 0.5rem;
+    margin: 0 1rem 1rem;
+}
+canvas {
+    object-fit: cover;
+}
+
+.action-bar {
+    display: flex;
+    flex-direction: column;
+}
+
+.action-bar > * {
+    min-width: 10rem !important;
+    margin: 1rem 0 !important;
+}
+
+.page-controls {
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+}
+
+.page-controls > button {
+    margin: 1rem;
+}
+
+@media (min-width: 768px) {
+    .action-bar {
+        flex-direction: row;
+        justify-content: space-between;
+    }
 }
