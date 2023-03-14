@@ -57,6 +57,8 @@ class App extends Component<any, AppState> {
             <div className="image-container" key={drawingSlice[0] && drawingSlice[0].key_id || 0}>{drawings}</div>
             {this.state.drawings.length > 0 &&
                 <div className="page-controls">
+                    <Button variant="contained" onClick={() => this.viewIndexChange(this.randomIndex())}>Random</Button>
+                    <div>Or...</div>
                     <Button variant="contained" onClick={() => this.viewIndexChange(this.state.drawingsIndex - 1)} disabled={this.state.drawingsIndex <= 0}>Prev</Button>
                     <Button variant="contained" onClick={() => this.viewIndexChange(this.state.drawingsIndex + 1)} disabled={this.state.drawingsIndex >= Math.floor(this.state.drawings.length / this.state.numDrawings)}>Next</Button>
                 </div>
@@ -72,6 +74,10 @@ class App extends Component<any, AppState> {
     viewIndexChange(newVal: number) {
         this.scrollToTop();
         this.setState({ drawingsIndex: newVal });
+    }
+
+    randomIndex() {
+        return Math.floor(Math.random() * Math.ceil(this.state.drawings.length / this.state.numDrawings));
     }
 
     scrollToTop() {
